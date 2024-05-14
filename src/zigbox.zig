@@ -4,7 +4,7 @@ const eprint = std.debug.print;
 
 fn showCommands() void {
     eprint("zigbox :)\n", .{});
-    eprint("\nCurrently defined functions:\n", .{});
+    eprint("\nCurrently defined applets:\n", .{});
     inline for (comptime cmds.keys()) |key| {
         eprint("- {s}\n", .{key});
     }

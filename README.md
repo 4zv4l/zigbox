@@ -25,6 +25,18 @@ $ ./hi
 Hi !
 ```
 
+> The 'hi' applet is not (yet?) implemented.
+
+Without arguments, it will show the available commands:
+```bash
+$ zigbox
+zigbox :)
+
+Currently defined applets:
+- cat
+- sha256sum
+```
+
 ## implement a command
 
 To implement a command, simply add a `<command>.zig` in `src/commands`.
