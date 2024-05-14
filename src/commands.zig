@@ -2,6 +2,10 @@
 const std = @import("std");
 
 pub const cmds = std.StaticStringMap(*const fn (args: [][]const u8) u8).initComptime(.{
+    .{ "yes", @import("commands/yes.zig").entry },
+    .{ "pwd", @import("commands/pwd.zig").entry },
     .{ "cat", @import("commands/cat.zig").entry },
+    .{ "true", @import("commands/true.zig").entry },
+    .{ "false", @import("commands/false.zig").entry },
     .{ "sha256sum", @import("commands/sha256sum.zig").entry },
 });
