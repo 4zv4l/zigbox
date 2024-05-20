@@ -37,6 +37,14 @@ Currently defined applets:
 - sha256sum
 ```
 
+## how to try
+
+You can try `zigbox` in a chroot environment using the `chroot_test.sh` script.
+
+The script will create a test directory and do all the needed symlink and then will try to do a chroot (may requires more privileges).
+
+> You need to build the project first with `zig build`
+
 ## implement a command
 
 To implement a command, simply add a `<command>.zig` in `src/commands`.
