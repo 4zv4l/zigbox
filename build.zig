@@ -38,13 +38,4 @@ pub fn build(b: *std.Build) !void {
     // allow zigbox to @import("commands").cmds;
     exe.root_module.addAnonymousImport("commands", .{ .root_source_file = .{ .path = "src/commands.zig" } });
     b.installArtifact(exe);
-
-    // run step
-    const run_cmd = b.addRunArtifact(exe);
-    run_cmd.step.dependOn(b.getInstallStep());
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
-    const run_step = b.step("run", "Run the app");
-    run_step.dependOn(&run_cmd.step);
 }
