@@ -7,7 +7,8 @@ pub fn build(b: *std.Build) !void {
         .name = "zigbox",
         .root_source_file = b.path("src/zigbox.zig"),
         .target = b.standardTargetOptions(.{}),
-        .optimize = b.standardOptimizeOption(.{}),
+        .optimize = .ReleaseSmall, //b.standardOptimizeOption(.{}),
+        .strip = true,
     });
 
     // generate zig code that imports src/commands/*.zig
