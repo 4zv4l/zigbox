@@ -2,11 +2,10 @@ const std = @import("std");
 const io = std.io;
 const print = std.debug.print;
 
-// flush stdin
-fn flush(bstdin: anytype) void {
-    var stdin = bstdin.reader();
-    while (stdin.readByte() catch return != '\n') {}
-}
+const reserved = std.StaticStringMap(*const fn (args: [][]const u8) void).initComptime(.{
+    .{ "exit", exit },
+    .{ "cd", cd },
+});
 
 fn cd(args: [][]const u8) void {
     const path = if (args.len > 0) args[0] else ".";
@@ -19,11 +18,6 @@ fn exit(args: [][]const u8) void {
     const rc = if (args.len > 0) std.fmt.parseUnsigned(u8, args[0], 10) catch 0 else 0;
     std.process.exit(rc);
 }
-
-const reserved = std.StaticStringMap(*const fn (args: [][]const u8) void).initComptime(.{
-    .{ "exit", exit },
-    .{ "cd", cd },
-});
 
 pub fn entry(_: [][]const u8) u8 {
     var input: [4096]u8 = undefined;
@@ -39,7 +33,9 @@ pub fn entry(_: [][]const u8) u8 {
         print("$ ", .{});
         const in = stdin.readUntilDelimiterOrEof(&input, '\n') catch {
             print("Input is too long...\n", .{});
-            flush(&bstdin);
+            while (stdin.readByte() catch {
+                return 1;
+            } != '\n') {}
             continue;
         } orelse continue;
 
@@ -48,15 +44,14 @@ pub fn entry(_: [][]const u8) u8 {
             words.append(arg) catch continue;
         }
 
-        if (reserved.has(words.items[0])) {
-            //const args = if (words.items.len > 1) words.items[1..] else words.items[0..0];
-            reserved.get(words.items[0]).?(words.items[1..]);
+        if (reserved.get(words.items[0])) |reserved_cmd| {
+            reserved_cmd(words.items[1..]);
             continue;
         }
 
         var child = std.process.Child.init(words.items, allocator);
         _ = child.spawnAndWait() catch |err| {
-            print("exec: {s}\n", .{@errorName(err)});
+            print("exec {s}: {s}\n", .{ words.items[0], @errorName(err) });
             continue;
         };
     }
