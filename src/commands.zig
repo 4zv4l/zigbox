@@ -2,6 +2,8 @@
 const std = @import("std");
 
 pub const cmds = std.StaticStringMap(*const fn (args: [][]const u8) u8).initComptime(.{
+    .{ "ls", @import("commands/ls.zig").entry },
+    .{ "sh", @import("commands/sh.zig").entry },
     .{ "yes", @import("commands/yes.zig").entry },
     .{ "pwd", @import("commands/pwd.zig").entry },
     .{ "cat", @import("commands/cat.zig").entry },
