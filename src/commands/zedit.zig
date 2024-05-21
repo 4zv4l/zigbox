@@ -12,8 +12,8 @@ const actions = std.StaticStringMap(*const fn (f: fs.File, p: []const u8, s: *Li
     .{ "?", help },
 });
 
+// truncate the file then save the new content
 fn save(f: fs.File, p: []const u8, s: *Lines) void {
-    s.clearAndFree();
     f.setEndPos(0) catch |err| {
         print("error: {s}", .{@errorName(err)});
         return;
@@ -44,6 +44,7 @@ fn quit(_: fs.File, _: []const u8, _: *Lines) void {
 }
 
 fn edit(_: fs.File, _: []const u8, s: *Lines) void {
+    s.clearAndFree();
     var buff: [1024]u8 = undefined;
     var stdin = std.io.getStdIn().reader();
 
@@ -67,22 +68,26 @@ fn help(_: fs.File, p: []const u8, _: *Lines) void {
     , .{p});
 }
 
+// read an action from stdin
 fn getAction(stdin: anytype) ![1]u8 {
     print("> ", .{});
     return [1]u8{try stdin.readByte()};
 }
 
+// flush stdin (until finding \n)
 fn flush(stdin: anytype) void {
     while (stdin.readByte() catch return != '\n') {}
 }
 
-fn load(file: fs.File, lines: *Lines) !void {
+// load the file line by line
+fn load(file: fs.File, lines: *Lines, p: []const u8) !void {
     const data = try file.readToEndAlloc(allocator, 1024 * 1024 * 1024);
     defer allocator.free(data);
     var it = std.mem.splitScalar(u8, data, '\n');
     while (it.next()) |line| {
-        try lines.append(line);
+        try lines.append(try allocator.dupe(u8, line));
     }
+    print("loaded {d:.2} from {s}\n", .{ std.fmt.fmtIntSizeBin(data.len), p });
 }
 
 pub fn entry(args: [][]const u8) u8 {
@@ -92,7 +97,7 @@ pub fn entry(args: [][]const u8) u8 {
     }
 
     const path = args[1];
-    var file = std.fs.cwd().createFile(path, .{ .truncate = false }) catch |err| {
+    var file = std.fs.cwd().createFile(path, .{ .truncate = false, .read = true }) catch |err| {
         print("zedit: {s}: {s}\n", .{ path, @errorName(err) });
         return 1;
     };
@@ -100,7 +105,7 @@ pub fn entry(args: [][]const u8) u8 {
 
     var lines = Lines.init(allocator);
     defer lines.deinit();
-    load(file, &lines) catch |err| {
+    load(file, &lines, path) catch |err| {
         print("zedit: load: {s}\n", .{@errorName(err)});
         return 1;
     };
