@@ -76,6 +76,15 @@ fn flush(stdin: anytype) void {
     while (stdin.readByte() catch return != '\n') {}
 }
 
+fn load(file: fs.File, lines: *Lines) !void {
+    const data = try file.readToEndAlloc(allocator, 1024 * 1024 * 1024);
+    defer allocator.free(data);
+    var it = std.mem.splitScalar(u8, data, '\n');
+    while (it.next()) |line| {
+        try lines.append(line);
+    }
+}
+
 pub fn entry(args: [][]const u8) u8 {
     if (args.len == 1) {
         print("usage: zedit FILE\n", .{});
@@ -91,6 +100,10 @@ pub fn entry(args: [][]const u8) u8 {
 
     var lines = Lines.init(allocator);
     defer lines.deinit();
+    load(file, &lines) catch |err| {
+        print("zedit: load: {s}\n", .{@errorName(err)});
+        return 1;
+    };
 
     const stdin = std.io.getStdIn().reader();
     while (true) {
