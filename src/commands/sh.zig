@@ -38,6 +38,7 @@ pub fn entry(_: [][]const u8) u8 {
             } != '\n') {}
             continue;
         } orelse continue;
+        if (in.len == 0) continue;
 
         var it = std.mem.splitAny(u8, in, " ");
         while (it.next()) |arg| {
