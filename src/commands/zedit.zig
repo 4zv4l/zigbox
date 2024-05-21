@@ -13,7 +13,11 @@ const actions = std.StaticStringMap(*const fn (f: fs.File, p: []const u8, s: *Li
 });
 
 fn save(f: fs.File, p: []const u8, s: *Lines) void {
-    f.setEndPos(0) catch {};
+    s.clearAndFree();
+    f.setEndPos(0) catch |err| {
+        print("error: {s}", .{@errorName(err)});
+        return;
+    };
 
     var bwriter = std.io.bufferedWriter(f.writer());
     var writer = bwriter.writer();
