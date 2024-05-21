@@ -10,7 +10,7 @@ const reserved = std.StaticStringMap(*const fn (args: [][]const u8) void).initCo
 fn cd(args: [][]const u8) void {
     const path = if (args.len > 0) args[0] else ".";
     std.process.changeCurDir(path) catch |err| {
-        print("{s}: {s}\n", .{ path, @errorName(err) });
+        print("cd: {s}: {s}\n", .{ path, @errorName(err) });
     };
 }
 
@@ -51,7 +51,7 @@ pub fn entry(_: [][]const u8) u8 {
 
         var child = std.process.Child.init(words.items, allocator);
         _ = child.spawnAndWait() catch |err| {
-            print("exec {s}: {s}\n", .{ words.items[0], @errorName(err) });
+            print("sh: {s}: {s}\n", .{ words.items[0], @errorName(err) });
             continue;
         };
     }

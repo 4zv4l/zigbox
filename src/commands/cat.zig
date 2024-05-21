@@ -19,7 +19,7 @@ pub fn entry(args: [][]const u8) u8 {
     // if no args, read from stdin
     if (args.len == 1) {
         cat(std.io.getStdIn()) catch |err| {
-            eprint("{s}: {s}\n", .{ "-", @errorName(err) });
+            eprint("cat: {s}: {s}\n", .{ "-", @errorName(err) });
             return 1;
         };
     }
@@ -27,13 +27,13 @@ pub fn entry(args: [][]const u8) u8 {
     // cat each file
     for (args[1..]) |path| {
         var file = fs.cwd().openFile(path, .{}) catch |err| {
-            eprint("{s}: {s}\n", .{ path, @errorName(err) });
+            eprint("cat: {s}: {s}\n", .{ path, @errorName(err) });
             return 1;
         };
         defer file.close();
 
         cat(file) catch |err| {
-            eprint("{s}: {s}\n", .{ path, @errorName(err) });
+            eprint("cat: {s}: {s}\n", .{ path, @errorName(err) });
             return 2;
         };
     }

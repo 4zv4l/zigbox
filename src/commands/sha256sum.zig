@@ -25,7 +25,7 @@ pub fn entry(args: [][]const u8) u8 {
     // if no arguments, read from stdin
     if (args.len == 1) {
         const digest = sha256sum(std.io.getStdIn()) catch |err| {
-            print("-: {s}\n", .{@errorName(err)});
+            print("sha256sum: -: {s}\n", .{@errorName(err)});
             exit(2);
         };
         print("{x}  -\n", .{std.fmt.fmtSliceHexLower(&digest)});
@@ -36,14 +36,14 @@ pub fn entry(args: [][]const u8) u8 {
         const paths = args[1..];
         for (paths) |path| {
             const file = fs.cwd().openFile(path, .{}) catch |err| {
-                print("{s}: {s}\n", .{ path, @errorName(err) });
+                print("sha256sum: {s}: {s}\n", .{ path, @errorName(err) });
                 rc = 3;
                 continue;
             };
             defer file.close();
 
             const digest = sha256sum(file) catch |err| {
-                print("{s}: {s}\n", .{ path, @errorName(err) });
+                print("sha256sum: {s}: {s}\n", .{ path, @errorName(err) });
                 rc = 4;
                 continue;
             };

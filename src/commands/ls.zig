@@ -4,7 +4,7 @@ const fmtIntSizeBin = std.fmt.fmtIntSizeBin;
 const print = std.debug.print;
 
 const Mode = packed struct(u3) { read: bool, write: bool, exec: bool };
-const FMode = packed struct { u: Mode, g: Mode, o: Mode };
+const FMode = packed struct(u9) { u: Mode, g: Mode, o: Mode };
 fn modeToStr(mode: fs.File.Mode, kind: fs.File.Kind) [10]u8 {
     var str = [_]u8{'-'} ** 10;
     if (kind == .directory) str[0] = 'd';
