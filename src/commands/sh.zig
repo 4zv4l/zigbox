@@ -3,9 +3,15 @@ const io = std.io;
 const print = std.debug.print;
 
 const reserved = std.StaticStringMap(*const fn (args: [][]const u8) void).initComptime(.{
-    .{ "exit", exit },
+    .{ "echo", echo },
     .{ "cd", cd },
+    .{ "exit", exit },
 });
+
+fn echo(args: [][]const u8) void {
+    for (args) |arg| print("{s} ", .{arg});
+    print("\n", .{});
+}
 
 fn cd(args: [][]const u8) void {
     const path = if (args.len > 0) args[0] else ".";
