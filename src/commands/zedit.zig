@@ -45,13 +45,22 @@ fn quit(_: fs.File, _: []const u8, _: *Lines) void {
 
 fn edit(_: fs.File, _: []const u8, s: *Lines) void {
     s.clearAndFree();
-    var buff: [1024]u8 = undefined;
+    var buff: std.BoundedArray(u8, 4096) = .{};
     var stdin = std.io.getStdIn().reader();
 
-    while (stdin.readUntilDelimiter(&buff, '\n')) |line| {
-        if (line[0] == '?') return;
+    while (stdin.streamUntilDelimiter(buff.writer(), '\n', buff.capacity())) {
+        defer buff.resize(0) catch {};
+        if (buff.get(0) == '?') return;
 
-        s.append(allocator.dupe(u8, line) catch return) catch return;
+        var line = allocator.dupe(u8, buff.slice()) catch |err| {
+            print("dupe: {s}\n", .{@errorName(err)});
+            return;
+        };
+        line[line.len - 1] = '\n';
+        s.append(line) catch |err| {
+            print("append: {s}\n", .{@errorName(err)});
+            return;
+        };
     } else |_| {}
 }
 
