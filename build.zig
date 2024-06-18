@@ -24,7 +24,7 @@ pub fn build(b: *std.Build) !void {
     try code.writer().print("const std = @import(\"std\");\n\n", .{});
     try code.writer().print("pub const cmds = std.StaticStringMap(*const fn (args: [][]const u8) u8).initComptime(.{{\n", .{});
     while (try walker.next()) |entry| {
-        if (entry.kind == .file and std.mem.endsWith(u8, entry.basename, ".zig")) {
+        if (entry.kind == .file and std.mem.endsWith(u8, entry.basename, ".zig") and !std.mem.containsAtLeast(u8, entry.path, 1, "/")) {
             try code.writer().print("    .{{ \"{s}\", @import(\"commands/{s}\").entry }},\n", .{ entry.path[0 .. entry.path.len - 4], entry.path });
         }
     }
@@ -36,6 +36,6 @@ pub fn build(b: *std.Build) !void {
     _ = try file.writeAll(code.items);
 
     // allow zigbox to @import("commands").cmds;
-    exe.root_module.addAnonymousImport("commands", .{ .root_source_file = .{ .path = "src/commands.zig" } });
+    exe.root_module.addAnonymousImport("commands", .{ .root_source_file = .{ .cwd_relative = "src/commands.zig" } });
     b.installArtifact(exe);
 }

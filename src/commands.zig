@@ -2,14 +2,14 @@
 const std = @import("std");
 
 pub const cmds = std.StaticStringMap(*const fn (args: [][]const u8) u8).initComptime(.{
-    .{ "ls", @import("commands/ls.zig").entry },
-    .{ "sh", @import("commands/sh.zig").entry },
     .{ "yes", @import("commands/yes.zig").entry },
-    .{ "mkdir", @import("commands/mkdir.zig").entry },
-    .{ "pwd", @import("commands/pwd.zig").entry },
-    .{ "cat", @import("commands/cat.zig").entry },
+    .{ "ls", @import("commands/ls.zig").entry },
     .{ "true", @import("commands/true.zig").entry },
-    .{ "false", @import("commands/false.zig").entry },
-    .{ "zedit", @import("commands/zedit.zig").entry },
     .{ "sha256sum", @import("commands/sha256sum.zig").entry },
+    .{ "false", @import("commands/false.zig").entry },
+    .{ "mkdir", @import("commands/mkdir.zig").entry },
+    .{ "zedit", @import("commands/zedit.zig").entry },
+    .{ "pwd", @import("commands/pwd.zig").entry },
+    .{ "sh", @import("commands/sh.zig").entry },
+    .{ "cat", @import("commands/cat.zig").entry },
 });

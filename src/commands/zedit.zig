@@ -1,4 +1,5 @@
 const std = @import("std");
+const helper = @import("helper/helper.zig");
 const fs = std.fs;
 const Lines = std.ArrayList([]const u8);
 const print = std.debug.print;
@@ -83,11 +84,6 @@ fn getAction(stdin: anytype) ![1]u8 {
     return [1]u8{try stdin.readByte()};
 }
 
-// flush stdin (until finding \n)
-fn flush(stdin: anytype) void {
-    while (stdin.readByte() catch return != '\n') {}
-}
-
 // load the file line by line
 fn load(file: fs.File, lines: *Lines, p: []const u8) !void {
     const data = try file.readToEndAlloc(allocator, 1024 * 1024 * 1024);
@@ -123,10 +119,10 @@ pub fn entry(args: [][]const u8) u8 {
     while (true) {
         const action = getAction(stdin) catch {
             print("wrong action, press '?' for help\n", .{});
-            flush(stdin);
+            helper.flush(stdin) catch return 1;
             continue;
         };
-        flush(stdin);
+        helper.flush(stdin) catch return 1;
         if (actions.get(&action)) |do| do(file, path, &lines);
     }
 
